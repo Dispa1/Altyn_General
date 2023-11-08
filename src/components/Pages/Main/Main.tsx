@@ -27,16 +27,18 @@ function Main() {
   }[]>([]);
   
   const [sampleData, setSampleData] = useState<{
-  sample_id: number;
+  id: number;
   sampling_point: string;
   workshop_id: number;
   container_number: string;
   product_id: number;
   user_id: number;
+  product: string;
+  workshop: string;
   }[]>([]);
 
   const [shipmentData, setShipmentData] = useState<{
-    shipment_id: number;
+    id: number;
     container_number: string;
     purchaser_country: string;
     shipment_date: string;
@@ -52,10 +54,8 @@ function Main() {
 
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const navigate = useNavigate();
-
 
   const tabNames = ["Лаборатория", "ОТК", "Другой Таб", "Другой Таб"];
   const tabWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -66,38 +66,16 @@ function Main() {
       navigate('/Login');
     }
   };
-  
   useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const response = await axios.get(`${apiUrlAuth}/api/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('authToken')}`,
-          },
-        });
-        const userData = response.data;
-        const userId = userData.user_id;
-        setUserId(userId);
-  
-        if (userId) {
-          const userResponse = await axios.get(`${apiUrlAuth}/api/users/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem('authToken')}`,
-            },
-          });
-          const user = userResponse.data;
-          setUserName(user.username);
-        } else {
-          setUserName("Пользователь не найден");
-        }
-      } catch (error) {
-        console.error('Ошибка при получении данных о пользователе:', error);
-      }
-    }
-
     checkAuthTokenAndRedirect();
-  
-    fetchUserData();
+  });
+
+  useEffect(() => {
+    const storedUserName = sessionStorage.getItem('userName');
+    
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
   }, []);
   
   
@@ -177,6 +155,7 @@ function Main() {
   const navigateToLogin = () => {
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('userName');
     window.location.href = '/Login';
   };
 
@@ -340,7 +319,7 @@ function Main() {
       <tbody>
         {sampleData.map((rowData, index) => (
          <tr key={index}>
-         <td className={styles.bodyCell}>{rowData.sample_id}</td>
+         <td className={styles.bodyCell}>{rowData.id}</td>
          <td className={styles.bodyCell}>{rowData.sampling_point}</td>
          <td className={styles.bodyCell}>{rowData.workshop_id}</td>
          <td className={styles.bodyCell}>{rowData.container_number}</td>
@@ -381,7 +360,7 @@ function Main() {
       <tbody>
         {shipmentData.map((rowData, index) => (
           <tr key={index}>
-            <td className={styles.bodyCell}>{rowData.shipment_id}</td>
+            <td className={styles.bodyCell}>{rowData.id}</td>
             <td className={styles.bodyCell}>{rowData.container_number}</td>
             <td className={styles.bodyCell}>{rowData.purchaser_country}</td>
             <td className={styles.bodyCell}>{rowData.shipment_date}</td>
@@ -416,3 +395,5 @@ function Main() {
 }
 
 export default Main;
+
+//интерцептор
