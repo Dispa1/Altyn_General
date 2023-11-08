@@ -80,7 +80,6 @@ function Main() {
         setUserId(userId);
   
         if (userId) {
-          // Если userId существует, выполните запрос для получения пользователя по этому ID
           const userResponse = await axios.get(`${apiUrlAuth}/api/users/${userId}`, {
             headers: {
               Authorization: `Bearer ${sessionStorage.getItem('authToken')}`,
@@ -89,7 +88,6 @@ function Main() {
           const user = userResponse.data;
           setUserName(user.username);
         } else {
-          // Обработка ситуации, если userId отсутствует
           setUserName("Пользователь не найден");
         }
       } catch (error) {
