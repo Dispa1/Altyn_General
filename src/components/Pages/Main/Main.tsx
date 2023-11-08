@@ -4,8 +4,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const apiUrlLaboratory = 'http://localhost:5000';
-const apiUrlOTK = 'http://localhost:8000';
-const apiUrlAuth = 'http://127.0.0.1:8001';
+const apiUrlOTK = 'http://153.92.222.171:8001';
+const apiUrlAuth = 'http://153.92.222.171:8000';
 
 function Main() {
   const [activeTab, setActiveTab] = useState<number>(1);
