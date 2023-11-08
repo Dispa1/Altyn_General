@@ -4,8 +4,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const apiUrlLaboratory = 'http://localhost:5000';
-const apiUrlOTK = 'http://localhost:8000';
-const apiUrlAuth = 'http://127.0.0.1:8001';
+const apiUrlOTK = 'http://153.92.222.171:8001';
+const apiUrlAuth = 'http://153.92.222.171:8000';
 
 function Main() {
   const [activeTab, setActiveTab] = useState<number>(1);
@@ -27,16 +27,18 @@ function Main() {
   }[]>([]);
   
   const [sampleData, setSampleData] = useState<{
-  sample_id: number;
+  id: number;
   sampling_point: string;
   workshop_id: number;
   container_number: string;
   product_id: number;
   user_id: number;
+  product: string;
+  workshop: string;
   }[]>([]);
 
   const [shipmentData, setShipmentData] = useState<{
-    shipment_id: number;
+    id: number;
     container_number: string;
     purchaser_country: string;
     shipment_date: string;
@@ -52,13 +54,16 @@ function Main() {
 
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const navigate = useNavigate();
 
-
   const tabNames = ["Лаборатория", "ОТК", "Другой Таб", "Другой Таб"];
   const tabWrapperRef = useRef<HTMLDivElement | null>(null);
+
+
+
+  const tableHeadRef = useRef<HTMLDivElement>(null);
+  const tableBodyRef = useRef<HTMLDivElement>(null);
 
   const checkAuthTokenAndRedirect = () => {
     const authToken = sessionStorage.getItem('authToken');
@@ -66,50 +71,61 @@ function Main() {
       navigate('/Login');
     }
   };
-  
   useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const response = await axios.get(`${apiUrlAuth}/api/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('authToken')}`,
-          },
-        });
-        const userData = response.data;
-        const userId = userData.user_id;
-        setUserId(userId);
+    checkAuthTokenAndRedirect();
+  });
+
+  const handleUnauthorized = () => {
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('refreshToken');
+
+    navigate('/Login');
+  };
+
+  interface CustomError extends Error {
+    response?: {
+      status: number;
+    };
+  }
+
+  async function fetchUsername() {
+    try {
+      const response = await axios.get(`${apiUrlAuth}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('authToken')}`,
+        },
+      });
   
-        if (userId) {
-          // Если userId существует, выполните запрос для получения пользователя по этому ID
-          const userResponse = await axios.get(`${apiUrlAuth}/api/users/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem('authToken')}`,
-            },
-          });
-          const user = userResponse.data;
-          setUserName(user.username);
-        } else {
-          // Обработка ситуации, если userId отсутствует
-          setUserName("Пользователь не найден");
-        }
-      } catch (error) {
-        console.error('Ошибка при получении данных о пользователе:', error);
+      if (response.data && response.data.username) {
+        setUserName(response.data.username);
+      }
+    } catch (error) {
+      const customError = error as CustomError;
+      if (customError.response && customError.response.status === 401) {
+        handleUnauthorized();
+      } else {
+        console.error('Ошибка при получении username:', error);
       }
     }
+  }
 
-    checkAuthTokenAndRedirect();
-  
-    fetchUserData();
+  useEffect(() => {
+    fetchUsername();
   }, []);
   
-  
+
   async function fetchData() {
     try {
       const response = await axios.get(`${apiUrlLaboratory}/map-products-press-shop/getAll`);
       const data = response.data;
       setTableData(data);
     } catch (error) {
-      console.error('Ошибка при получении данных:', error);
+      const customError = error as CustomError;
+      if (customError.response && customError.response.status === 401) {
+        handleUnauthorized();
+      } else {
+        console.error('Ошибка при получении данных:', customError);
+      }
     }
   }
 
@@ -128,7 +144,12 @@ function Main() {
         const data = response.data;
         setSampleData(data);
       } catch (error) {
-        console.error('Ошибка при получении данных:', error);
+        const customError = error as CustomError;
+        if (customError.response && customError.response.status === 401) {
+          handleUnauthorized();
+        } else {
+          console.error('Ошибка при получении данных:', customError);
+        }
       }
     }
   
@@ -146,7 +167,12 @@ function Main() {
         const data = response.data;
         setShipmentData(data);
       } catch (error) {
-        console.error('Ошибка при получении данных:', error);
+        const customError = error as CustomError;
+        if (customError.response && customError.response.status === 401) {
+          handleUnauthorized();
+        } else {
+          console.error('Ошибка при получении данных:', customError);
+        }
       }
     }
   
@@ -179,9 +205,9 @@ function Main() {
   const navigateToLogin = () => {
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('userName');
     window.location.href = '/Login';
   };
-
 
 
   return (
@@ -237,14 +263,14 @@ function Main() {
   <table>
   <thead>
     <tr>
-      <th className={`${styles.headerCell} ${styles.topLeftCornerCell}`} rowSpan={2}>Номер</th>
+      <th className={styles.headerCell} rowSpan={2}>Номер</th>
       <th className={styles.headerCell} rowSpan={2}>Дата</th>
       <th className={styles.headerCell} rowSpan={2}>Время</th>
       <th className={styles.headerCell} colSpan={2}>После жаровни</th>
       <th className={styles.headerCell} colSpan={4}>После винтового пресса</th>
       <th className={styles.headerCell} colSpan={2}>Жмых после охлаждения</th>
       <th className={styles.headerCell} colSpan={2}>Декантер</th>
-      <th className={`${styles.headerCell} ${styles.topRightCornerCell}`} rowSpan={2}>Примечание</th>
+      <th className={styles.headerCell} rowSpan={2}>Примечание</th>
     </tr>
     <tr>
       <th className={styles.headerCell}>Жаровня 1</th>
@@ -260,8 +286,8 @@ function Main() {
     </tr>
   </thead>
 </table>
-
   </div>
+
   <div className={styles.tableBody}>
     <table>
       <tbody>
@@ -342,7 +368,7 @@ function Main() {
       <tbody>
         {sampleData.map((rowData, index) => (
          <tr key={index}>
-         <td className={styles.bodyCell}>{rowData.sample_id}</td>
+         <td className={styles.bodyCell}>{rowData.id}</td>
          <td className={styles.bodyCell}>{rowData.sampling_point}</td>
          <td className={styles.bodyCell}>{rowData.workshop_id}</td>
          <td className={styles.bodyCell}>{rowData.container_number}</td>
@@ -383,7 +409,7 @@ function Main() {
       <tbody>
         {shipmentData.map((rowData, index) => (
           <tr key={index}>
-            <td className={styles.bodyCell}>{rowData.shipment_id}</td>
+            <td className={styles.bodyCell}>{rowData.id}</td>
             <td className={styles.bodyCell}>{rowData.container_number}</td>
             <td className={styles.bodyCell}>{rowData.purchaser_country}</td>
             <td className={styles.bodyCell}>{rowData.shipment_date}</td>
@@ -418,3 +444,5 @@ function Main() {
 }
 
 export default Main;
+
+//интерцептор

@@ -168,26 +168,6 @@
   100%{top: -100vh; opacity: 0;}
   }
   
-  @-webkit-keyframes fadeIn{
-  from{opacity: 0;}
-  to{opacity: 1;}
-  }
-  
-  @-moz-keyframes fadeIn{
-  from{opacity: 0;}
-  to{opacity: 1;}
-  }
-  
-  @-o-keyframes fadeIn{
-  from{opacity: 0;}
-  to{opacity: 1;}
-  }
-  
-  @keyframes fadeIn{
-  from{opacity: 0;}
-  to{opacity: 1;}
-  }
-  
   @-webkit-keyframes fadeOut{
   0%{opacity: 0;}
   30%{opacity: 1;}
