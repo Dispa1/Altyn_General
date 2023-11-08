@@ -15,7 +15,7 @@ FROM nginx:alpine
 
 RUN rm -rf /usr/share/nginx/html/*
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=0 /app/build /usr/share/nginx/index.html
 
 EXPOSE 80
 
