@@ -19,12 +19,12 @@ const Login: React.FC = () => {
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
-    setErrorMessage(''); // Сбросить сообщение об ошибке при взаимодействии с инпутом
+    setErrorMessage('');
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    setErrorMessage(''); // Сбросить сообщение об ошибке при взаимодействии с инпутом
+    setErrorMessage('');
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
