@@ -1,4 +1,3 @@
-
 FROM node:14
 
 WORKDIR /app
@@ -10,6 +9,8 @@ RUN npm install
 COPY . .
 
 RUN npm run build
+
+COPY nginx.conf /etc/nginx/nginx.conf
 
 FROM nginx:alpine
 
