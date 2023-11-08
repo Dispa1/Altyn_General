@@ -75,6 +75,7 @@ function Main() {
     checkAuthTokenAndRedirect();
   });
 
+<<<<<<< HEAD
   const handleUnauthorized = () => {
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('refreshToken');
@@ -111,6 +112,14 @@ function Main() {
 
   useEffect(() => {
     fetchUsername();
+=======
+  useEffect(() => {
+    const storedUserName = sessionStorage.getItem('userName');
+    
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+>>>>>>> e1e2fe6f6ad9c9c82d6ed89df3c64c8983edd28d
   }, []);
   
 
