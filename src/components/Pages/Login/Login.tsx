@@ -21,12 +21,12 @@ const Login: React.FC = () => {
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
-    setErrorMessage('');
+    setErrorMessage(''); 
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    setErrorMessage('');
+    setErrorMessage(''); 
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -40,10 +40,11 @@ const Login: React.FC = () => {
 
       console.log('Успешно авторизован:', response.data);
 
-      sessionStorage.setItem('authToken', response.data.access);
-      sessionStorage.setItem('refreshToken', response.data.refresh);
+      sessionStorage.setItem('authToken', response.data.access_token);
+      sessionStorage.setItem('refreshToken', response.data.refresh_token);
+      sessionStorage.setItem('userName', username)
 
-      navigate('/');
+      navigate('/', { state: { username: response.data.username } });
     } catch (error) {
       console.error('Ошибка авторизации:', error);
       setErrorMessage('Неверное имя пользователя или пароль!');
