@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './index.module.scss';
 
+const apiUrlAuth = 'http://153.92.222.171:8000';
+
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -31,7 +33,7 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://127.0.0.1:8001/api/auth/sign-in', {
+      const response = await axios.post(`${apiUrlAuth}/api/auth/sign-in`, {
         username,
         password,
       });
