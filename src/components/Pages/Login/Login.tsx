@@ -42,12 +42,8 @@ const Login: React.FC = () => {
 
       sessionStorage.setItem('authToken', response.data.access_token);
       sessionStorage.setItem('refreshToken', response.data.refresh_token);
-<<<<<<< HEAD
-=======
-      sessionStorage.setItem('userName', username)
->>>>>>> e1e2fe6f6ad9c9c82d6ed89df3c64c8983edd28d
 
-      navigate('/', { state: { username: response.data.username } });
+      navigate('/');
     } catch (error) {
       console.error('Ошибка авторизации:', error);
       setErrorMessage('Неверное имя пользователя или пароль!');
